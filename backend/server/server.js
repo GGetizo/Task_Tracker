@@ -3,6 +3,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 require('dotenv').config()
 const connectDB = require('./config/dbconn.js')
+const corsOptions = require('./config/corsOption.js')
 const PORT = process.env.PORT || 5000
 
 connectDB();
@@ -11,7 +12,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors);
+app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
     console.log(req);

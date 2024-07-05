@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const Task = require('../models/Task');
+const jwt = require('jsonwebtoken')
 
 // @desc Get all tasks
 // @route GET /tasks
