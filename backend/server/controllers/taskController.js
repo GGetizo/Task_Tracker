@@ -1,72 +1,121 @@
-import Task from '../models/Task.js'; // Adjust path as necessary
+const asyncHandler = require('express-async-handler');
+const User = require('../models/User');
+const Task = require('../models/Task');
 
-// Retrieve all tasks for the authenticated user
-export const getTasks = async (req, res) => {
-    try {
-        const tasks = await Task.find({ user: req.user.id });
-        res.status(200).json(tasks);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+// @desc Get all tasks
+// @route GET /tasks
+// @access Private
+const getAllTasks = asyncHandler(async (req, res) => {
+    // Get all tasks from MongoDB
+    const tasks = await Task.find().lean();
+
+    // If no tasks
+    if (!tasks?.length) {
+        return res.status(400).json({ message: 'No tasks found' });
     }
-};
 
-// Add a new task for the authenticated user
-export const createTask = async (req, res) => {
-    try {
-        const { title, description } = req.body;
+    // Add username to each task
+    const tasksWithUser = await Promise.all(tasks.map(async (task) => {
+        const user = await User.findById(task.user).lean().exec();
+        return { ...task, username: user.username };
+    }));
 
-        const newTask = new Task({
-            user: req.user.id,
-            title,
-            description
-        });
+    res.json(tasksWithUser);
+});
 
-        await newTask.save();
+// @desc Create new task
+// @route POST /tasks
+// @access Private
+const createNewTask = asyncHandler(async (req, res) => {
+    const { user, title, description } = req.body;
 
-        res.status(201).json(newTask);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+    // Confirm data
+    if (!user || !title || !description) {
+        return res.status(400).json({ message: 'All fields are required' });
     }
-};
 
-// Update an existing task for the authenticated user
-export const updateTask = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { title, description, completed } = req.body;
+    // Check for duplicate title
+    const duplicate = await Task.findOne({ title }).lean().exec();
 
-        // Find the task and check if it belongs to the authenticated user
-        const task = await Task.findOne({ _id: id, user: req.user.id });
-        if (!task) {
-            return res.status(404).json({ message: 'Task not found' });
-        }
-
-        // Update task fields
-        task.title = title || task.title;
-        task.description = description || task.description;
-        task.completed = completed !== undefined ? completed : task.completed;
-
-        await task.save();
-
-        res.status(200).json(task);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+    if (duplicate) {
+        return res.status(409).json({ message: 'Duplicate task title' });
     }
-};
 
-// Remove a task for the authenticated user
-export const deleteTask = async (req, res) => {
-    try {
-        const { id } = req.params;
+    // Create and store the new task
+    const taskObject = { user, title, description };
+    const task = await Task.create(taskObject);
 
-        // Find the task and check if it belongs to the authenticated user
-        const task = await Task.findOneAndDelete({ _id: id, user: req.user.id });
-        if (!task) {
-            return res.status(404).json({ message: 'Task not found' });
-        }
-
-        res.status(200).json({ message: 'Task deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+    if (task) { // Created 
+        return res.status(201).json({ message: 'New task created' });
+    } else {
+        return res.status(400).json({ message: 'Invalid task data received' });
     }
+});
+
+// @desc Update a task
+// @route PATCH /tasks
+// @access Private
+const updateTask = asyncHandler(async (req, res) => {
+    const { id, user, title, description, completed } = req.body;
+
+    // Confirm data
+    if (!id || !user || !title || !description || typeof completed !== 'boolean') {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Confirm Task exists to update
+    const task = await Task.findById(id).exec();
+
+    if (!task) {
+        return res.status(400).json({ message: 'Task not found' });
+    }
+
+    // Check for duplicate title
+    const duplicate = await Task.findOne({ title }).lean().exec();
+
+    // Allow renaming of the original task 
+    if (duplicate && duplicate?._id.toString() !== id) {
+        return res.status(409).json({ message: 'Duplicate task title' });
+    }
+
+    task.user = user;
+    task.title = title;
+    task.description = description;
+    task.completed = completed;
+
+    const updatedTask = await task.save();
+
+    res.json({ message: `'${updatedTask.title}' updated` });
+});
+
+// @desc Delete a task
+// @route DELETE /tasks
+// @access Private
+const deleteTask = asyncHandler(async (req, res) => {
+    const { id } = req.body;
+
+    // Confirm data
+    if (!id) {
+        return res.status(400).json({ message: 'Task ID required' });
+    }
+
+    // Confirm task exists to delete 
+    const task = await Task.findById(id).exec();
+
+    if (!task) {
+        return res.status(400).json({ message: 'Task not found' });
+    }
+
+    await task.deleteOne();
+
+    const reply = `Task '${task.title}' with ID ${task._id} deleted`;
+
+    res.json({ message: reply });
+});
+
+module.exports = {
+    getAllTasks,
+    createNewTask,
+    updateTask,
+    deleteTask
 };

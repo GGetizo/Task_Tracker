@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
+const jwt =  require('jsonwebtoken');
 
 // Middleware function to protect routes and check JWT tokens
-export const authMiddleware = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
     // Retrieve the token from the Authorization header
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -24,3 +24,5 @@ export const authMiddleware = (req, res, next) => {
         res.status(401).json({ message: 'Token is not valid' });
     }
 };
+
+module.exports = authMiddleware;

@@ -1,63 +1,33 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes.js';
-import taskRoutes from './routes/taskRoutes.js';
-import jwt from 'jsonwebtoken';
-import connectDB from './utils/db.js';
+const express = require('express')
+const cors = require('cors')
+const mongoose = require('mongoose')
+require('dotenv').config()
+const connectDB = require('./config/dbconn.js')
+const PORT = process.env.PORT || 5000
 
-// Load environment variables from .env file
-dotenv.config();
+connectDB();
 
 const app = express();
 
-
 // Middleware
 app.use(express.json());
-
-app.use(cors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type'],
-}));
-
+app.use(cors);
 
 app.get('/', (req, res) => {
     console.log(req);
     return res.status(234).send('Welcome aaa');
 });
 
-export const authMiddleware = (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+app.use('/users', require('./routes/userRoutes.js'));
+app.use('/tasks', require('./routes/taskRoutes.js'));
 
-    if (!token) {
-        return res.status(401).json({ message: 'No token, authorization denied' });
-    }
+mongoose.connection.once('open', () => {
+    console.log('Connected to MongoDB')
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+})
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // Attach user info to request object
-        next();
-    } catch (err) {
-        res.status(401).json({ message: 'Token is not valid' });
-    }
-};
+mongoose.connection.on('error', err => {
+    console.log(err)
+    logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log')
+})
 
-app.use('/users', userRoutes);
-app.use('/tasks', taskRoutes);
-
-
-const startServer = async () => {
-    try {
-        await connectDB(); // Connect to MongoDB
-        const PORT = process.env.PORT || 5000; // Access the PORT value
-        app.listen(PORT, () => {
-            console.log(`App is listening on port: ${PORT}`);
-        });
-    } catch (error) {
-        console.error('Error starting the server:', error.message);
-    }
-};
-
-startServer();

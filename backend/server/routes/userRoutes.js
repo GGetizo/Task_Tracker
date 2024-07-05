@@ -1,14 +1,17 @@
-import express from 'express';
-import { registerUser, loginUser } from '../controllers/userController.js'; // Adjust path if necessary
-import { authMiddleware } from '../utils/auth.js'; // Adjust path to auth.js
+const express = require('express')
+const userController =  require('../controllers/userController.js')
 
 const router = express.Router();
 
-router.use(authMiddleware);
+router.route('/')
+    .get(userController.getAllUsers)
+    .post(userController.createNewUser)
+    .get(userController.loginUser)
+    .patch(userController.updateUser)
+    .delete(userController.deleteUser);
 
-// Define routes
-router.post('/register', registerUser); // Register a new user
-router.post('/login', loginUser); // Login a user
+router.route('/:id')
+    .get(userController.getUser)
+    .delete(userController.deleteUserById)
 
-export default router;
-
+module.exports = router
