@@ -1,6 +1,5 @@
 "use client"
 import axios from "../api/axios";
-import { useRouter } from 'next/navigation';
 import { 
     useState,
     useRef,
@@ -11,12 +10,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Header from "@/components/header";
+import { AxiosError } from "axios";
+const REGISTER_URL = '/users/register';
 
 const USER_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z]).{6,24}$/;
-const REGISTER_URL = '/users/register';
 
+interface ErrorResponse {
+    message: string;
+  }
 
 export default function Page() {
     const userRef = useRef<HTMLInputElement | null>(null);
@@ -78,11 +81,13 @@ export default function Page() {
             }));
             console.log(response.data);
             setSuccess(true);
-        } catch (err) {
+        } catch (error) {
+            const err = error as AxiosError;
             if (!err?.response) {
                 setErrMsg('No Server Response');
             } else if (err.response?.status === 400) {
-                setErrMsg('Bad Request: ' + (err.response.data.message || 'Invalid Input'));
+                const data = err.response.data as ErrorResponse;
+                setErrMsg('Bad Request: ' + (data.message || 'Invalid Input'));
             } else if (err.response?.status === 409) {
                 setErrMsg('Username Taken');
             } else {
@@ -112,13 +117,13 @@ export default function Page() {
             <div>
             <Header />
             <div className="flex justify-center m-20">
-                <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
-                    {errMsg}
-                </p>
                 <Card className="w-auto flex justify-center items-center"
                 style={{boxShadow:'10px 10px 45px #d4d4d4, -10px -10px 45px #d4d4d4'}}>
-                    <CardContent>
-                        <p className="p-5 flex justify-center">Sign Up</p>
+                    <CardContent className="px-20 py-10">
+                    <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
+                    {errMsg}
+                    </p>
+                        <p className="p-5 text-4xl font-bold  flex justify-center">Sign Up</p>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label htmlFor="username">
@@ -131,6 +136,7 @@ export default function Page() {
                                     <p>Valid</p>
                                 </span>
                                 <Input
+                                    className="w-96"
                                     type="text"
                                     id="username"
                                     ref={userRef}
@@ -160,6 +166,7 @@ export default function Page() {
                                     <p>Valid</p>
                                 </span>
                                 <Input
+                                    className="w-96"
                                     type="email"
                                     placeholder="juandelacruz@gmail.com"
                                     value={email}
@@ -185,6 +192,7 @@ export default function Page() {
                                     <p>Valid</p>
                                 </span>
                                 <Input
+                                    className="w-96"
                                     type="password"
                                     placeholder="*********"
                                     id="password"
@@ -211,6 +219,7 @@ export default function Page() {
                                     <p>Valid</p>
                                 </span>
                                 <Input
+                                    className="w-96"
                                     type="password"
                                     placeholder="*********"
                                     id="confirm_pwd"
@@ -225,8 +234,12 @@ export default function Page() {
                                     Must match the password<br/>
                                 </p>
                             </div>
-                            <Button disabled={!validName || !validEmail || !validPwd || !validMatchPwd ? true : false}
-                             type="submit" className="w-96" variant={"outline"}>Submit</Button>
+                            <div className="flex justify-center">
+                                <Button disabled={!validName || !validEmail || !validPwd || !validMatchPwd ? true : false}
+                                type="submit" className="w-56 rounded" variant={"outline"}>
+                                    Submit
+                                </Button>
+                            </div>
                             <p className="text-xs">Already have an account?</p>
                             <Link href="/login_page">
                                 <p className="text-xs hover:underline">Log In</p>

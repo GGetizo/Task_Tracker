@@ -45,14 +45,12 @@ const loginUser = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Find user by username
     const user = await User.findOne({ username }).exec();
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(401).json({ message: 'Invalid username or password' });
     }
 
-    // Create JWT token
     const accessToken = jwt.sign(
         {
             UserInfo: {
@@ -65,7 +63,13 @@ const loginUser = asyncHandler(async (req, res) => {
         { expiresIn: '1h' }
     );
 
-    res.json({ accessToken });
+    res.cookie('accessToken', accessToken, {
+        httpOnly: true, // Prevents client-side access to the cookie
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: 'strict', // Helps prevent CSRF attacks
+    });
+
+    res.json({ message: 'Logged in successfully' });
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {
@@ -79,9 +83,37 @@ const getAllUsers = asyncHandler(async (req, res) => {
     res.json(users);
 });
 
+// @desc Get current user details
+// @route GET /users/me
+// @access Private
+const getUser = asyncHandler(async (req, res) => {
+    const username = req.user; // Get the username from req.user
+
+    // Find user by username
+    const user = await User.findOne({ username }).lean().exec();
+
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+        username: user.username,
+        email: user.email,
+    });
+});
+
+// @desc Logout user
+// @route POST /users/logout
+// @access Public
+const logoutUser = (req, res) => {
+    console.log('Logout request received');
+    res.status(200).json({ message: 'Logged out successfully' });
+};
 
 module.exports = {
     createNewUser,
     loginUser,
-    getAllUsers
+    getAllUsers,
+    getUser,
+    logoutUser
 };

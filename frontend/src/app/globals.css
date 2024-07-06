@@ -3,12 +3,28 @@
   @tailwind utilities;
 
 .instructions {
-    display: block; /* Make sure it shows when the class is applied */
-}
-.offscreen {
-    display: none; /* Make sure it hides when the class is applied */
+    display: block;
+    font-size: small;
 }
 
-.hide {
-  display: none;
+.offscreen, .hide {
+    display: none;
+}
+
+.errmsg {
+  display: flex;
+  justify-content: center;
+  color: red;
+  font-size: medium;
+  font-weight: bold;
+}
+
+.valid {
+  font-size: small;
+  color:yellow;
+}
+
+.invalid {
+  font-size: small;
+  color:red;
 }
