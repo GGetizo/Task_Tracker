@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Header from "@/components/header";
+import Footer from "@/components/footer";
 import { useAuth } from "@/context/authProvider";
 import axios from "../api/axios"; // Import axios for making HTTP requests
 import { AxiosError } from "axios";
@@ -90,11 +91,11 @@ export default function Login() {
                 <h1>Log In Succesful</h1>
             </section>
         ) : (
-        <div> 
+        <div className="w-auto bg-gradient-to-br from-[#000000] to-[#130F40]"> 
             <Header />
             <div className="flex justify-center m-20">
-                <Card className="w-[28rem] flex justify-center items-center"
-                style={{boxShadow:'10px 10px 45px #d4d4d4, -10px -10px 45px #d4d4d4'}}>
+                <Card className="lg:w-[28rem] w-80 flex justify-center items-cente bg-[#E8E4C9]"
+                style={{boxShadow:'10px 10px 45px #000000, -10px -10px 45px #000000'}}>
                     <CardContent className="px-20 py-10">
                     <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
                     {errMsg}
@@ -139,6 +140,7 @@ export default function Login() {
                     </CardContent>
                 </Card>
             </div>
+            <Footer/>
         </div>
         )}
     </>

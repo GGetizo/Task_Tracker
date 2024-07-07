@@ -31,77 +31,61 @@ const getUserTasks = asyncHandler(async (req, res) => {
     res.json(tasks);
 });
 
-// @desc Create new task
-// @route POST /tasks/newTask
+// @desc Create a new task
+// @route POST /tasks
 // @access Private
-const createNewTask = asyncHandler(async (req, res) => {
-    const { title, description, createdAt } = req.body;
-    const userId = req.userId; // Get the user ID from the request object
-  
-    // Confirm data
-    if (!userId || !title || !description || !createdAt) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-  
-    // Check for duplicate title
-    const duplicate = await Task.findOne({ title }).lean().exec();
-  
-    if (duplicate) {
-      return res.status(409).json({ message: 'Duplicate task title' });
-    }
-  
-    // Create and store the new task
-    const taskObject = { user: userId, title, description, createdAt };
-    const task = await Task.create(taskObject);
-  
-    if (task) {
-      return res.status(201).json({ message: 'New task created' });
-    } else {
-      return res.status(400).json({ message: 'Invalid task data received' });
-    }
-  });
+const createTask = asyncHandler(async (req, res) => {
+  const { title, description, completed } = req.body;
+  const userId = req.userId; // Extract userId from authenticated request
+
+  if (!title || !description) {
+    return res.status(400).json({ message: 'Title and description are required' });
+  }
+
+  try {
+    const task = new Task({
+      title,
+      description,
+      completed,
+      user: userId, // Associate task with user
+    });
+
+    const createdTask = await task.save();
+    res.status(201).json(createdTask);
+  } catch (error) {
+    res.status(400).json({ message: 'Invalid task data received' });
+  }
+});
+
 
 // @desc Update a task
-// @route PATCH /tasks
+// @route PATCH /tasks/:id
 // @access Private
-const updateTask = asyncHandler(async (req, res) => {
-    const { title, description, completed } = req.body;
-    const userId = req.userId; // Get the user ID from the request object
-    const taskId = req.params.id; // Get the task ID from URL parameters
+const updateTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, deadline } = req.body;
 
-    // Confirm data
-    if (!title || !description || typeof completed !== "boolean") {
-        return res.status(400).json({ message: "All fields are required" });
+    // Convert deadline to Date if needed
+    const updatedDeadline = deadline ? new Date(deadline) : undefined;
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      { title, description, deadline: updatedDeadline }, // Include deadline in update
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Confirm Task exists to update
-    const task = await Task.findById(taskId).exec();
+    res.status(200).json({ task: updatedTask });
+  } catch (error) {
+    console.error("Error updating task:", error);
+    res.status(500).json({ message: 'Error updating task' });
+  }
+};
 
-    if (!task) {
-        return res.status(400).json({ message: "Task not found" });
-    }
-
-    // Ensure the task belongs to the logged-in user
-    if (task.user.toString() !== userId) {
-        return res.status(403).json({ message: "You do not have permission to update this task" });
-    }
-
-    // Check for duplicate title
-    const duplicate = await Task.findOne({ title }).lean().exec();
-
-    // Allow renaming of the original task
-    if (duplicate && duplicate?._id.toString() !== taskId) {
-        return res.status(409).json({ message: "Duplicate task title" });
-    }
-
-    task.title = title;
-    task.description = description;
-    task.completed = completed;
-
-    const updatedTask = await task.save();
-
-    res.json({ message: `'${updatedTask.title}' updated` });
-});
 
 // @desc Delete a task
 // @route DELETE /tasks
@@ -136,7 +120,7 @@ const deleteTask = asyncHandler(async (req, res) => {
 
 module.exports = {
   getAllTasks,
-  createNewTask,
+  createTask,
   getUserTasks,
   updateTask,
   deleteTask,

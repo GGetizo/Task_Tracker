@@ -17,9 +17,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "../app/api/axios";
 import { AxiosError } from "axios";
-import { useAuth } from "../context/authProvider"; // Ensure this import path is correct
+import { useAuth } from "../context/authProvider";
 
-const CREATE_TASK_URL = "/tasks/newTask"; // Adjust the URL according to your setup
+const CREATE_TASK_URL = "/tasks/newTask";
 
 export default function TaskList() {
   const [date, setDate] = useState<Date | undefined>();
@@ -34,28 +34,27 @@ export default function TaskList() {
   console.log('userId:', userId);
   console.log('isAuthenticated:', authData);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
     if (!title || !description || !date) {
       setErrorMsg("All fields are required");
-      setSuccessMsg(""); // Clear success message
+      setSuccessMsg("");
       return;
     }
   
     if (!authData) {
       setErrorMsg("User is not authenticated");
-      setSuccessMsg(""); // Clear success message
+      setSuccessMsg("");
       return;
     }
   
     try {
       const response = await axios.post(CREATE_TASK_URL, {
-        user: userId,
         title,
         description,
-        createdAt: date,
+        completed: false, // Set default value if needed
+        // createdAt: date.toISOString(), // Not needed as it's handled by default value
       }, {
         headers: {
           Authorization: `Bearer ${authData.accessToken}`,
@@ -64,7 +63,7 @@ export default function TaskList() {
   
       console.log('Response:', response);
       setSuccessMsg("Task created successfully!");
-      setErrorMsg(""); // Clear error message
+      setErrorMsg("");
       setTitle("");
       setDescription("");
       setDate(undefined);
@@ -81,25 +80,26 @@ export default function TaskList() {
         console.error('An unknown error occurred');
       }
       setErrorMsg("Failed to create task. Please try again.");
-      setSuccessMsg(""); // Clear success message
+      setSuccessMsg("");
     }
   };
+
   return (
     <div className="flex flex-col space-y-5 ">
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button className="w-[36.2rem] border-2 bg-neutral-400 hover:bg-neutral-600 rounded-xl" variant="outline">
-              Add
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#F4ECE6] rounded w-auto border-solid border-2 border-black 
-          lg:overflow-auto overflow-scroll lg:max-h-[100%] max-h-[70%]">
-            <AlertDialogTitle className="flex justify-center m-0">
-              <p>Create a task</p>
-            </AlertDialogTitle>
-            <AlertDialogDescription className="flex justify-center">
-                <p className="m-0">Please enter all fields</p>
-            </AlertDialogDescription>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button className="lg:w-[36.2rem] w-72 border-2 bg-neutral-400 hover:bg-neutral-600 rounded-xl" variant="outline">
+            Add
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent className="bg-[#F4ECE6] rounded w-auto border-solid border-2
+         border-black lg:overflow-auto overflow-scroll lg:max-h-[100%] max-h-[70%]">
+          <AlertDialogTitle className="flex justify-center m-0">
+            <p>Create a task</p>
+          </AlertDialogTitle>
+          <AlertDialogDescription className="flex justify-center">
+            <p className="m-0">Please enter all fields</p>
+          </AlertDialogDescription>
           <form onSubmit={handleSubmit}>
             <label htmlFor="title">
               <p className="font-bold">Task Title</p>
@@ -147,7 +147,7 @@ export default function TaskList() {
             {successMsg && <p className="text-green-500">{successMsg}</p>}
           </form>
         </AlertDialogContent>
-        </AlertDialog>
+      </AlertDialog>
     </div>
   );
 }
