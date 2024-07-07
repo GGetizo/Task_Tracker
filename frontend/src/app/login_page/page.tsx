@@ -91,7 +91,7 @@ export default function Login() {
                 <h1>Log In Succesful</h1>
             </section>
         ) : (
-        <div className="w-auto bg-gradient-to-br from-[#000000] to-[#130F40]"> 
+        <div className="bg-gradient-to-br from-[#000000] to-[#130F40]"> 
             <Header />
             <div className="flex justify-center m-20">
                 <Card className="lg:w-[28rem] w-80 flex justify-center items-cente bg-[#E8E4C9]"
