@@ -3,9 +3,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 
-// @desc Register new user
-// @route POST /users/register
-// @access Public
 const createNewUser = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -16,24 +13,24 @@ const createNewUser = asyncHandler(async (req, res) => {
 
     // Check for duplicate username or email
     const duplicate = await User.findOne({ $or: [{ username }, { email }] }).lean().exec();
-
     if (duplicate) {
         return res.status(409).json({ message: 'Username or email already exists' });
     }
 
     // Hash password
-    const hashedPwd = await bcrypt.hash(password, 10); // salt rounds
+    const hashedPwd = await bcrypt.hash(password, 10);
 
     // Create and store new user
     const userObject = { username, email, password: hashedPwd };
     const user = await User.create(userObject);
 
-    if (user) { // created
+    if (user) {
         res.status(201).json({ message: `New user ${username} created` });
     } else {
         res.status(400).json({ message: 'Invalid user data received' });
     }
 });
+
 
 // @desc Login user
 // @route POST /users/login

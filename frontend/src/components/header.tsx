@@ -15,6 +15,18 @@ export default function Header() {
             console.log('Header: No user authenticated');
         }
     }, [authData]);
+    
+    const handleLogout = async (event: React.MouseEvent) => {
+        event.preventDefault(); // Prevent default button behavior
+        
+        try {
+            await logout(); // Call the logout function
+            // Reload the page
+            window.location.reload();
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
 
     return (
         <header className="h-6 top-0 flex flex-row items-center justify-between lg:px-4 px-2 py-8">
@@ -28,7 +40,8 @@ export default function Header() {
                 {authData ? (
                     <>
                         <p className="lg:text-base text-xs text-white">Welcome, {authData.username}</p>
-                        <Button onClick={logout} variant={"outline"} className="rounded border-black bg-red-600 hover:bg-red-800 w-14 h-7 text-white">
+                    
+                        <Button onClick={handleLogout} variant={"outline"} className="rounded border-black bg-red-600 hover:bg-red-800 w-14 h-7 text-white">
                             Logout
                         </Button>
                     </>
