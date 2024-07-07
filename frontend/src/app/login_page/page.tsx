@@ -55,9 +55,13 @@ export default function Login() {
                     withCredentials: true
                 }
             );
-            console.log(JSON.stringify(response?.data));
-            const accessToken = response?.data?.accessToken;
-            const user = { username, accessToken };
+            console.log('Response data:', response?.data); // Log the full response data
+    
+            const { accessToken, userId } = response?.data; // Extract userId
+            const user = { username, accessToken, userId }; // Include userId
+    
+            console.log('User object:', user); // Log the user object
+    
             setAuth(user);
             localStorage.setItem('user', JSON.stringify(user)); // Sync with localStorage
             setUser('');
@@ -77,7 +81,8 @@ export default function Login() {
             errRef.current?.focus();
         }
     }
-
+    
+ 
     return (
         <>
         {success ? (

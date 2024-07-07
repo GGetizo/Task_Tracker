@@ -63,13 +63,12 @@ const loginUser = asyncHandler(async (req, res) => {
         { expiresIn: '1h' }
     );
 
-    res.cookie('accessToken', accessToken, {
-        httpOnly: true, // Prevents client-side access to the cookie
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-        sameSite: 'strict', // Helps prevent CSRF attacks
+    // Optionally, send `userId` in the response body if not using cookies
+    res.json({
+        message: 'Logged in successfully',
+        accessToken,
+        userId: user._id
     });
-
-    res.json({ message: 'Logged in successfully' });
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {
@@ -87,9 +86,8 @@ const getAllUsers = asyncHandler(async (req, res) => {
 // @route GET /users/me
 // @access Private
 const getUser = asyncHandler(async (req, res) => {
-    const username = req.user; // Get the username from req.user
+    const username = req.user; // Or req.userId if you store userId
 
-    // Find user by username
     const user = await User.findOne({ username }).lean().exec();
 
     if (!user) {
@@ -99,8 +97,10 @@ const getUser = asyncHandler(async (req, res) => {
     res.json({
         username: user.username,
         email: user.email,
+        userId: user._id
     });
 });
+
 
 // @desc Logout user
 // @route POST /users/logout

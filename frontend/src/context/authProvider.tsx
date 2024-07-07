@@ -1,21 +1,22 @@
-"use client";
-
+"use client"
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:5000';
 
 interface AuthContextType {
-    authData: { username: string; accessToken: string } | null;
-    setAuth: React.Dispatch<React.SetStateAction<{ username: string; accessToken: string } | null>>;
+    authData: { username: string; accessToken: string; userId: string } | null;
+    setAuth: React.Dispatch<React.SetStateAction<{ username: string; accessToken: string; userId: string } | null>>;
     login: (username: string, password: string) => Promise<void>;
     logout: () => void;
+    isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
     authData: null,
     setAuth: () => {},
     login: async () => {},
-    logout: () => {}
+    logout: () => {},
+    isAuthenticated: false,
 });
 
 interface AuthProviderProps {
@@ -25,29 +26,31 @@ interface AuthProviderProps {
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [authData, setAuthData] = useState<{ username: string; accessToken: string } | null>(null);
+    const [authData, setAuthData] = useState<{ username: string; accessToken: string; userId: string } | null>(null);
 
     useEffect(() => {
         const userString = localStorage.getItem('user');
         if (userString) {
             const user = JSON.parse(userString);
             setAuthData(user);
-            console.log('AuthProvider: Loaded user from localStorage', user);
         }
     }, []);
 
     const login = async (username: string, password: string) => {
         try {
             const response = await axios.post('/users/login', { username, password });
-            const { accessToken } = response.data;
-            const user = { username, accessToken };
+            const { accessToken, userId } = response.data; // Ensure your API response includes userId
+            const user = { username, accessToken, userId };
             setAuthData(user);
             localStorage.setItem('user', JSON.stringify(user));
             console.log('AuthProvider: User logged in', user);
+            console.log('userId:', userId);
+            console.log('isAuthenticated:', isAuthenticated);
         } catch (error) {
             console.error('Login failed:', error);
             throw new Error('Login failed');
         }
+        
     };
 
     const logout = async () => {
@@ -71,8 +74,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const isAuthenticated = !!authData;
+
     return (
-        <AuthContext.Provider value={{ authData, setAuth: setAuthData, login, logout }}>
+        <AuthContext.Provider value={{ authData, setAuth: setAuthData, login, logout, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );
