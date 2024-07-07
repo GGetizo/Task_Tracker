@@ -1,0 +1,30 @@
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
+.instructions {
+    display: block;
+    font-size: small;
+}
+
+.offscreen, .hide {
+    display: none;
+}
+
+.errmsg {
+  display: flex;
+  justify-content: center;
+  color: red;
+  font-size: medium;
+  font-weight: bold;
+}
+
+.valid {
+  font-size: small;
+  color:yellow;
+}
+
+.invalid {
+  font-size: small;
+  color:red;
+}
