@@ -91,7 +91,7 @@ export default function Login() {
                 <h1>Log In Succesful</h1>
             </section>
         ) : (
-        <div className="w-auto bg-gradient-to-br from-[#000000] to-[#130F40]"> 
+        <div className="bg-gradient-to-br from-[#171717] to-[#20196b]"> 
             <Header />
             <div className="flex justify-center m-20">
                 <Card className="lg:w-[28rem] w-80 flex justify-center items-cente bg-[#E8E4C9]"
@@ -130,7 +130,7 @@ export default function Login() {
                                 />
                             </div>
                             <div className="flex justify-center">
-                                <Button type="submit" variant={"outline"} className="w-56 rounded">Sign In</Button>
+                                <Button type="submit" variant={"outline"} className="w-56 rounded bg-[#D7BDFF] hover:bg-[#501C82]">Sign In</Button>
                             </div>
                                 <p className="text-xs">Don&apos;t have an account?</p>
                                 <Link href="/register_page">

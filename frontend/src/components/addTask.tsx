@@ -88,59 +88,59 @@ export default function TaskList() {
     <div className="flex flex-col space-y-5 ">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button className="lg:w-[36.2rem] w-72 border-2 bg-neutral-400 hover:bg-neutral-600 rounded-xl" variant="outline">
+          <Button className="lg:w-[36.2rem] w-72 border-2 bg-[#D7BDFF] hover:bg-[#501C82] rounded-xl" variant="outline">
             Add
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className="bg-[#F4ECE6] rounded w-auto border-solid border-2
+        <AlertDialogContent className="bg-[#171717] rounded w-auto border-solid border-2
          border-black lg:overflow-auto overflow-scroll lg:max-h-[100%] max-h-[70%]">
           <AlertDialogTitle className="flex justify-center m-0">
-            <p>Create a task</p>
+            <p className="text-white">Create a task</p>
           </AlertDialogTitle>
           <AlertDialogDescription className="flex justify-center">
-            <p className="m-0">Please enter all fields</p>
+            <p className="m-0 text-white">Please enter all fields</p>
           </AlertDialogDescription>
           <form onSubmit={handleSubmit}>
             <label htmlFor="title">
-              <p className="font-bold">Task Title</p>
+              <p className="font-bold text-white">Task Title</p>
             </label>
             <Input
               type="text"
-              className="rounded w-auto"
+              className="rounded w-72 text-white"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
             <label htmlFor="description">
-              <p className="font-bold">Task Description</p>
+              <p className="font-bold text-white">Task Description</p>
             </label>
             <Textarea
-              className="rounded w-auto"
+              className="rounded w-72 text-white"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
             />
             <label htmlFor="date">
-              <p className="font-bold">Deadline</p>
+              <p className="font-bold text-white">Deadline</p>
             </label>
             <Button
               variant={"outline"}
               className={cn(
                 "w-[280px] justify-start text-left font-normal",
-                !date && "text-muted-foreground"
+                !date && "text-muted-foreground border-none"
               )}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
+              <CalendarIcon className="mr-2 h-4 w-4 text-white rounded"/>
+              {date ? format(date, "PPP") : <span className="text-white">Pick a date</span>}
             </Button>
             <Calendar
-              className="bg-white border-solid border-2 border-black"
+              className="bg-[#171717] border-none text-white"
               mode="single"
               selected={date}
               onSelect={setDate}
               initialFocus
             />
-            <Button type="submit" className="mt-4 hover:bg-gray-600 rounded" variant="outline">
+            <Button type="submit" className="mt-4 bg-[#D7BDFF] hover:bg-[#501C82] rounded" variant="outline">
               Submit
             </Button>
             {errorMsg && <p className="text-red-500">{errorMsg}</p>}

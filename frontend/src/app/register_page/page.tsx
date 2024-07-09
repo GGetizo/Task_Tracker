@@ -107,7 +107,7 @@ export default function Page() {
                     </Card>
                 </section>
             ) : (
-                <div className="bg-gradient-to-br from-[#000000] to-[#130F40]">
+                <div className="bg-gradient-to-br from-[#171717] to-[#20196b]">
                     <Header />
                     <div className="flex justify-center m-20">
                         <Card className="lg:w-auto w-72 flex justify-center items-center bg-[#E8E4C9]"
@@ -232,7 +232,7 @@ export default function Page() {
                                         <Button
                                             disabled={!validName || !validEmail || !validPwd || !validMatchPwd}
                                             type="submit"
-                                            className="w-56 rounded"
+                                            className="w-56 rounded bg-[#D7BDFF] hover:bg-[#501C82]"
                                             variant={"outline"}
                                         >
                                             Submit

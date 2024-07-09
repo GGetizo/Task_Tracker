@@ -69,7 +69,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="font-sans w-auto bg-gradient-to-br from-[#000000] to-[#130F40]">
+      <div className="font-sans w-auto bg-gradient-to-br from-[#171717] to-[#20196b]">
         <Header />
         <div className="flex flex-col items-center mt-32">
           <p className="text-xl font-bold text-white">TASKS</p>
@@ -83,15 +83,15 @@ export default function Home() {
                 <div className="flex justify-center p-4">
                 </div>
                 {tasks.map((task) => (
-                  <div key={task._id} className="bg-[#F4ECE6] p-4 border border-gray-200 rounded">
+                  <div key={task._id} className="bg-[#171717] p-4 border border-gray-200 rounded">
                     <div className="flex flex-col space-y-4">
-                      <p className="font-bold">{task.title}</p>
-                      <p>{task.description}</p>
+                      <p className="font-bold text-white">{task.title}</p>
+                      <p className="text-white">{task.description}</p>
                       <div className="flex items-center space-x-2">
-                        <Checkbox checked={task.completed} /> {/* Assume you handle the checked state */}
-                        <label>Completed</label>
+                        <Checkbox className="text-white" checked={task.completed} />
+                        <label className="text-white">Completed</label>
                       </div>
-                      <p>Deadline: {task.deadline ? new Date(task.deadline).toLocaleDateString() : 'No deadline set'}</p>
+                      <p className="text-white">Deadline: {task.deadline ? new Date(task.deadline).toLocaleDateString() : 'No deadline set'}</p>
                       <div className="flex space-x-2">
                         <EditButton task={task} onUpdate={handleUpdateTask} />
                         <Button
