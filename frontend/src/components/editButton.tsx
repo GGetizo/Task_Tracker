@@ -71,45 +71,47 @@ const EditButton: React.FC<EditButtonProps> = ({ task, onUpdate }) => {
         <AlertDialogTrigger asChild>
           <Button
             variant="outline"
-            className="border-black border-solid border-2 rounded bg-neutral-400 hover:bg-neutral-600"
+            className="border-black border-solid border-2 rounded bg-[#49D649] hover:bg-[#348734]"
           >
             Edit
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className="bg-white border-black lg:overflow-auto overflow-scroll lg:max-h-[100%] max-h-[70%]">
+        <AlertDialogContent
+        className="bg-[#171717] w-auto border-black lg:overflow-auto overflow-scroll lg:max-h-[100%] max-h-[70%]">
           <AlertDialogTitle>
-            <p>Edit Task</p>
+            <p className="flex justify-center text-white">Edit Task</p>
           </AlertDialogTitle>
           <AlertDialogDescription>
-            <p>Edit your task</p>
+            <p className="flex justify-center text-white">Edit your task</p>
           </AlertDialogDescription>
           <form onSubmit={handleSubmit}>
             <label htmlFor="editTitle">
-              <p>Edit Title</p>
+              <p className="font-bold text-white">Edit Title</p>
             </label>
-            <Input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <Input type="text" value={title} onChange={(e) => setTitle(e.target.value)}
+             className="text-white rounded w-72"/>
             <label htmlFor="editDescription">
-              <p>Edit Description</p>
+              <p className="font-bold text-white">Edit Description</p>
             </label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="text-white rounded w-72"/>
             <label htmlFor="date">
-              <p className="font-bold">Deadline</p>
+              <p className="font-bold text-white">Deadline</p>
             </label>
             <Button
               variant={"outline"}
               className={cn(
-                "w-[280px] justify-start text-left font-normal",
+                "w-72 justify-start text-left font-normal text-white border-black bord-solid border-2",
                 !date && "text-muted-foreground"
               )}
               onClick={(e) => {
                 e.preventDefault();
               }}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
+              <CalendarIcon className="mr-2 h-4 w-4"/>
+              {date ? format(date, "PPP") : <p>Pick a date</p>}
             </Button>
             <Calendar
-              className="bg-white border-solid border-2 border-black"
+              className="bg-[#171717] w-72 text-white border-black bord-solid border-2"
               mode="single"
               selected={date}
               onSelect={setDate}
@@ -118,7 +120,7 @@ const EditButton: React.FC<EditButtonProps> = ({ task, onUpdate }) => {
             {error && <p className="text-red-500 text-center">{error}</p>}
             <Button
               type="submit"
-              className="mt-4 hover:bg-gray-600 rounded"
+              className="mt-4 bg-[#D7BDFF] hover:bg-[#501C82] rounded"
               variant="outline"
             >
               Submit
